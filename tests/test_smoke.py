@@ -1,6 +1,10 @@
 import re
 
+import pytest
 from playwright.sync_api import Page, expect
+
+# Marks every test in this file as smoke (P1)
+pytestmark = pytest.mark.smoke
 
 # The address of the trade page, added to base_url from pytest.ini
 TRADE_URL = "/trade/SOL_USD_PERP"

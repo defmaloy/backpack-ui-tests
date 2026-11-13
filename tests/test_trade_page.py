@@ -1,6 +1,10 @@
 import re
 
 from playwright.sync_api import expect
+import pytest
+
+# Marks every test in this file as smoke (P1)
+pytestmark = pytest.mark.smoke
 
 
 # Checks that the order book has both tabs: "Book" and "Trades"

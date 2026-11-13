@@ -1,5 +1,3 @@
-from symtable import Class
-
 from playwright.sync_api import Page
 
 

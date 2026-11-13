@@ -4,9 +4,11 @@ from playwright.sync_api import Page
 
 
 class OrderBook:
-    """The order book panel on the trade page."""
+    """The order book panel on the trade page: the Book / Trades tabs and the price list."""
 
+    # Describes how to find the order book's elements (nothing is searched yet)
     def __init__(self, page: Page):
+        # The two tabs at the top of the panel
         self.book_tab = page.get_by_role("tab", name="Book", exact=True)
         self.trades_tab = page.get_by_role("tab", name="Trades", exact=True)
 
