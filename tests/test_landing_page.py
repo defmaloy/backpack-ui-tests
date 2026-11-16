@@ -3,11 +3,10 @@ import re
 import pytest
 from playwright.sync_api import expect
 
+from tests.data import FAKE_EMAIL
+
 # Marks every test in this file as smoke (P1)
 pytestmark = pytest.mark.smoke
-
-# A fake address from a domain reserved for examples: nothing is ever created
-FAKE_EMAIL = "test@example.com"
 
 
 # Checks that the header "Log in" and "Sign up" links are visible and lead to the right pages
