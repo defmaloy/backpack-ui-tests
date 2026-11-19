@@ -1,0 +1,7 @@
+# Not needed inside the image: keeps it small and avoids Windows-only files
+.venv/
+.git/
+.idea/
+.pytest_cache/
+__pycache__/
+test-results/
