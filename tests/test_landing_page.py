@@ -19,7 +19,8 @@ def test_header_has_log_in_and_sign_up_links(landing_page):
     expect(header.sign_up_link).to_have_attribute("href", "/signup")
 
 
-# Checks that the Trade menu is closed at first, then opens and shows its 3 markets
+# Checks that the Trade menu is closed at first, then opens and shows its markets.
+# Stocks is not checked: the site hides it for some countries (e.g. the US, where CI runs)
 def test_trade_menu_shows_markets(landing_page):
     header = landing_page.header
 
@@ -28,12 +29,10 @@ def test_trade_menu_shows_markets(landing_page):
 
     header.open_trade_menu()
 
-    # After: all 3 links are visible and lead to the right markets
+    # After: the links shown in every region are visible and lead to the right markets
     expect(header.trade_menu_crypto).to_have_attribute("href", "/trade/BTC_USD")
-    expect(header.trade_menu_stocks).to_have_attribute("href", "/stocks/NVDA")
     expect(header.trade_menu_perpetuals).to_have_attribute("href", "/trade/BTC_USD_PERP")
     expect(header.trade_menu_crypto).to_be_visible()
-    expect(header.trade_menu_stocks).to_be_visible()
     expect(header.trade_menu_perpetuals).to_be_visible()
 
 

@@ -18,15 +18,14 @@ class LandingHeader:
         self.trade_menu_button = self.nav.get_by_role("button", name="Trade", exact=True)
 
         # Links inside the Trade menu (hidden until the menu opens).
-        # Full names: a short "Perpetuals" would also match the top-level link
+        # The menu differs by country: US visitors get no Stocks item and a shorter
+        # Perpetuals description. These names match the text common to all regions.
         self.trade_menu_crypto = self.nav.get_by_role(
             "link", name="Crypto Spot markets and Convert"
         )
-        self.trade_menu_stocks = self.nav.get_by_role(
-            "link", name="Stocks Real US stocks, no commission"
-        )
+        # Contains-match: "...Perps on crypto" (US) and "...Perps on crypto and stocks"
         self.trade_menu_perpetuals = self.nav.get_by_role(
-            "link", name="Perpetuals Perps on crypto and stocks"
+            "link", name="Perpetuals Perps on crypto"
         )
 
     # Opens the Trade menu the way a user does: the mouse over "Trade"

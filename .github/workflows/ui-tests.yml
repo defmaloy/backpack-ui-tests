@@ -1,0 +1,52 @@
+# Runs the smoke tests on GitHub's machines
+name: UI tests
+
+# When it runs: every push to main, every Pull Request into main, or by hand
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # One job: the P1 smoke suite
+  smoke:
+    # Note: GitHub's runners are in the US, and Backpack shows US visitors
+    # a different landing page (no Stocks). Tests check only what all regions share.
+    runs-on: ubuntu-latest
+    # Stop a stuck run instead of waiting for hours
+    timeout-minutes: 20
+
+    steps:
+      # Downloads the repository code onto the machine
+      - uses: actions/checkout@v5
+
+      # Installs Python, the same version as on your computer; caches pip downloads
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      # Installs pytest and pytest-playwright from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Installs Chromium and the Linux libraries it needs
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      # Runs the P1 tests, headless (there is no screen on the server)
+      - name: Run smoke tests
+        run: pytest -m smoke -v
+
+      # Only if a test failed: keeps traces and screenshots for 7 days
+      - name: Upload traces and screenshots
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
