@@ -12,6 +12,8 @@ on:
 jobs:
   # One job: the P1 smoke suite
   smoke:
+    # Note: GitHub's runners are in the US, and Backpack shows US visitors
+    # a different landing page (no Stocks). Tests check only what all regions share.
     runs-on: ubuntu-latest
     # Stop a stuck run instead of waiting for hours
     timeout-minutes: 20
@@ -19,10 +21,6 @@ jobs:
     steps:
       # Downloads the repository code onto the machine
       - uses: actions/checkout@v5
-
-      # Temporary: shows which country this CI machine is in
-      - name: Show runner country
-        run: curl -s https://ipinfo.io/country
 
       # Installs Python, the same version as on your computer; caches pip downloads
       - uses: actions/setup-python@v6
