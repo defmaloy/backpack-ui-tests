@@ -1,2 +1,4 @@
-pytest
-pytest-playwright
+# Exact versions: the same everywhere. Playwright must match the Docker image tag
+pytest==9.2.0
+pytest-playwright==0.10.0
+playwright==1.65.1
