@@ -20,6 +20,10 @@ jobs:
       # Downloads the repository code onto the machine
       - uses: actions/checkout@v5
 
+      # Temporary: shows which country this CI machine is in
+      - name: Show runner country
+        run: curl -s https://ipinfo.io/country
+
       # Installs Python, the same version as on your computer; caches pip downloads
       - uses: actions/setup-python@v6
         with:
