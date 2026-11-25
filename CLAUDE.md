@@ -21,6 +21,7 @@ A UI test suite (pytest + Playwright, sync API, Python) for the **live productio
 - One behaviour per test. Check the "before" state too when a test checks a change (e.g. a menu is hidden before it opens).
 - Name the technique in the comment above the test, for example: `# Decision table: email filled, password empty -> button disabled`.
 - Use `pytest.mark.parametrize` when several cases share the same steps.
+- After writing or changing tests, run only the changed test file once (`pytest <file> -v`) and report the result. Never re-run the whole suite in a loop.
 
 ## Commands
 
