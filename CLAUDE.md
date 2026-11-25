@@ -1,0 +1,58 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+A UI test suite (pytest + Playwright, sync API, Python) for the **live production site** https://backpack.exchange. No app code lives here. It is a public portfolio project: every line must be clear enough for the owner to explain in an interview.
+
+## Hard rules
+
+- Public pages only. Never log in, never use real credentials, never click buttons that create an account or log in ("Log in", "Open account").
+- Fake data lives only in `tests/data.py` (example.com email). It is typed into forms, never submitted.
+- Run tests gently: no loops or repeated runs against the live site.
+- Never run `git push` and never commit to `main`. Work on a branch; the human reviews every diff before committing.
+- Don't change `.github/workflows/`, `Dockerfile` or `requirements.txt` unless asked.
+
+## Test design
+
+- Before writing a test, list its cases and name the technique used: equivalence partitioning, boundary values, decision table, state transition, or error guessing. Show this list in the plan for review first.
+- Pick the technique that fits: a form with several inputs → decision table; a value with limits → boundary values; tabs, menus or open/closed states → state transition.
+- One behaviour per test. Check the "before" state too when a test checks a change (e.g. a menu is hidden before it opens).
+- Name the technique in the comment above the test, for example: `# Decision table: email filled, password empty -> button disabled`.
+- Use `pytest.mark.parametrize` when several cases share the same steps.
+
+## Commands
+
+Local (venv in `.venv/`, Windows):
+- Install: `pip install -r requirements.txt` then `playwright install chromium`
+- All tests: `pytest`
+- Smoke suite (what CI runs): `pytest -m smoke -v`
+- Single test: `pytest tests/test_login_page.py::test_login_form_is_visible`
+- Watch the browser: add `--headed` (and `--slowmo 500` if needed)
+
+Docker (same image as CI):
+- `docker build -t backpack-ui-tests .`
+- `docker run --rm --ipc=host -v "${PWD}/test-results:/app/test-results" backpack-ui-tests`
+
+On failure, traces and screenshots go to `test-results/` (configured in `pytest.ini`). Open a trace with `playwright show-trace <path>/trace.zip`.
+
+There is no linter or formatter configured.
+
+## Architecture
+
+- `pytest.ini` sets `base_url`, so page paths are relative (`/login`), and `pythonpath = .`, so `pages` and `tests` import from the repo root.
+- `pages/base_page.py`: `BasePage` holds the Playwright `page` and a class-level `PATH`; `open()` calls `goto(PATH, wait_until="domcontentloaded")`. Don't wait for full load: the site streams charts and live data.
+- Page objects (`pages/*_page.py`) subclass `BasePage` and set `PATH`. Larger pages are made of components in `pages/components/` (plain classes taking `page`, not `BasePage` subclasses). Example: `TradePage` has `order_book` and `order_form`.
+- Locators are defined as attributes in `__init__` (lazy; nothing is searched yet). Tests call `expect(...)` on them directly. Page-object methods only perform user actions (`fill_form`, `open_trade_menu`); assertions stay in tests.
+- `conftest.py` provides fixtures (`landing_page`, `login_page`, `trade_page`) that build the page object and already open it. It also raises the global `expect` timeout to 10 s.
+- Tests mark the whole module with `pytestmark = pytest.mark.smoke` (P1 user paths).
+
+## Conventions and gotchas
+
+- Locator style: prefer `get_by_role` / `get_by_label` with `exact=True`. Scope to a container (`header`, `main`, or a component `root`) when the same text appears twice on the page (e.g. two "Sign up" buttons). For elements without stable ids, describe them by content (see `OrderBook.root`) and match numbers by regex pattern, never by live values.
+- Region differences: the CI runners are in the US, and Backpack shows US visitors a different landing page (no Stocks, shorter descriptions). Assert only on text common to all regions.
+- A contains-match without `exact=True` is allowed only on purpose, with a comment saying why (see `LandingHeader.trade_menu_perpetuals`).
+- Version pinning: `playwright` in `requirements.txt` must match the Docker base image tag in `Dockerfile` (`mcr.microsoft.com/playwright/python:vX.Y.Z-noble`). Bump them together.
+- Code style: a short comment above every test, fixture and method, and a docstring for every class, explaining *what* and *why* in plain English.
+- CI (`.github/workflows/ui-tests.yml`) builds the Docker image and runs the smoke suite on every push and PR to `main`. Failure artifacts are uploaded for 7 days.
