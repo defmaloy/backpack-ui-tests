@@ -3,3 +3,5 @@ __pycache__/
 .pytest_cache/
 .idea/
 test-results/
+# Snapshots and logs from the AI agent's browser (Playwright MCP)
+.playwright-mcp/
