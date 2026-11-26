@@ -3,7 +3,8 @@
   "permissions": {
     "defaultMode": "plan",
     "allow": [
-      "Bash(pytest *)"
+      "Bash(pytest *)",
+      "mcp__playwright"
     ],
     "deny": [
       "Bash(git push *)",
