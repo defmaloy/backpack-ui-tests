@@ -8,7 +8,8 @@ A UI test suite (pytest + Playwright, sync API, Python) for the **live productio
 
 ## Hard rules
 
-- Public pages only. Never log in, never use real credentials, never click buttons that create an account or log in ("Log in", "Open account").
+- Public pages only. Never log in, never use real credentials.
+- Clicking the "Log in" and "Sign up" navigation links is allowed: they only open `/login` and `/signup`. Never click the "Log in" or "Open account" submit buttons.
 - Fake data lives only in `tests/data.py` (example.com email). It is typed into forms, never submitted.
 - Run tests gently: no loops or repeated runs against the live site.
 - Never run `git push` and never commit to `main`. Work on a branch; the human reviews every diff before committing.
