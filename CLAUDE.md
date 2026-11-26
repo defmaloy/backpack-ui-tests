@@ -14,6 +14,13 @@ A UI test suite (pytest + Playwright, sync API, Python) for the **live productio
 - Never run `git push` and never commit to `main`. Work on a branch; the human reviews every diff before committing.
 - Don't change `.github/workflows/`, `Dockerfile` or `requirements.txt` unless asked.
 
+## Browser exploration (Playwright MCP)
+
+- Use a 1280x720 viewport. A narrow window shows the mobile layout, which our tests don't cover.
+- Read the page with the accessibility snapshot, not with JavaScript. The snapshot shows the roles and names our locators use.
+- Only open and read pages. Never click anything that trades, logs in or creates an account.
+- When the exploration is finished, always close the browser with `browser_close`. Don't leave it running.
+
 ## Test design
 
 - Before writing a test, list its cases and name the technique used: equivalence partitioning, boundary values, decision table, state transition, or error guessing. Show this list in the plan for review first.
@@ -29,6 +36,7 @@ Local (venv in `.venv/`, Windows):
 - Install: `pip install -r requirements.txt` then `playwright install chromium`
 - All tests: `pytest`
 - Smoke suite (what CI runs): `pytest -m smoke -v`
+- Regression suite (P2, not in CI yet): `pytest -m regression -v`
 - Single test: `pytest tests/test_login_page.py::test_login_form_is_visible`
 - Watch the browser: add `--headed` (and `--slowmo 500` if needed)
 
@@ -43,11 +51,11 @@ There is no linter or formatter configured.
 ## Architecture
 
 - `pytest.ini` sets `base_url`, so page paths are relative (`/login`), and `pythonpath = .`, so `pages` and `tests` import from the repo root.
-- `pages/base_page.py`: `BasePage` holds the Playwright `page` and a class-level `PATH`; `open()` calls `goto(PATH, wait_until="domcontentloaded")`. Don't wait for full load: the site streams charts and live data.
-- Page objects (`pages/*_page.py`) subclass `BasePage` and set `PATH`. Larger pages are made of components in `pages/components/` (plain classes taking `page`, not `BasePage` subclasses). Example: `TradePage` has `order_book` and `order_form`.
+- `pages/base_page.py`: `BasePage` holds the Playwright `page`; `open()` calls `goto(self.PATH, wait_until="domcontentloaded")`. Don't wait for full load: the site streams charts and live data.
+- Page objects (`pages/*_page.py`) subclass `BasePage` and set `PATH`: as a class attribute for a fixed page (`LoginPage`), or in `__init__` when the address depends on a parameter (`TradePage(page, market="SOL_USD_PERP")`). Larger pages are made of components in `pages/components/` (plain classes taking `page`, not `BasePage` subclasses). Example: `TradePage` has `order_book` and `order_form`.
 - Locators are defined as attributes in `__init__` (lazy; nothing is searched yet). Tests call `expect(...)` on them directly. Page-object methods only perform user actions (`fill_form`, `open_trade_menu`); assertions stay in tests.
 - `conftest.py` provides fixtures (`landing_page`, `login_page`, `trade_page`) that build the page object and already open it. It also raises the global `expect` timeout to 10 s.
-- Tests mark the whole module with `pytestmark = pytest.mark.smoke` (P1 user paths).
+- Tests mark the whole module with `pytestmark`: `pytest.mark.smoke` for P1 user paths (run in CI), `pytest.mark.regression` for P2 checks (new files, not run in CI yet).
 
 ## Conventions and gotchas
 
