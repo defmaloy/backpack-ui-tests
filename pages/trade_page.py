@@ -20,3 +20,7 @@ class TradePage(BasePage):
         self.top_bar = AppTopBar(page)     # search, Log in, Sign up
         self.search = MarketSearch(page)   # the dialog the search button opens
         self.sidebar = AppSidebar(page)    # left menu: Home, Trade, Spot, ...
+
+        # What the page shows instead of a market when the address is unknown.
+        # Plain text (not a heading), searched inside <main>
+        self.market_not_found = page.get_by_role("main").get_by_text("Market Not Found", exact=True)

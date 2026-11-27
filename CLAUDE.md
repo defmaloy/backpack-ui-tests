@@ -37,7 +37,7 @@ Local (venv in `.venv/`, Windows):
 - Install: `pip install -r requirements.txt` then `playwright install chromium`
 - All tests: `pytest`
 - Smoke suite (what CI runs): `pytest -m smoke -v`
-- Regression suite (P2, not in CI yet): `pytest -m regression -v`
+- Regression suite (P2 and P3, not in CI yet): `pytest -m regression -v`
 - Single test: `pytest tests/test_login_page.py::test_login_form_is_visible`
 - Watch the browser: add `--headed` (and `--slowmo 500` if needed)
 
@@ -55,8 +55,8 @@ There is no linter or formatter configured.
 - `pages/base_page.py`: `BasePage` holds the Playwright `page`; `open()` calls `goto(self.PATH, wait_until="domcontentloaded")`. Don't wait for full load: the site streams charts and live data.
 - Page objects (`pages/*_page.py`) subclass `BasePage` and set `PATH`: as a class attribute for a fixed page (`LoginPage`), or in `__init__` when the address depends on a parameter (`TradePage(page, market="SOL_USD_PERP")`). Larger pages are made of components in `pages/components/` (plain classes taking `page`, not `BasePage` subclasses). Example: `TradePage` has `order_book` and `order_form`.
 - Locators are defined as attributes in `__init__` (lazy; nothing is searched yet). Tests call `expect(...)` on them directly. Page-object methods only perform user actions (`fill_form`, `open_trade_menu`); assertions stay in tests.
-- `conftest.py` provides fixtures (`landing_page`, `login_page`, `trade_page`) that build the page object and already open it. It also raises the global `expect` timeout to 10 s.
-- Tests mark the whole module with `pytestmark`: `pytest.mark.smoke` for P1 user paths (run in CI), `pytest.mark.regression` for P2 checks (new files, not run in CI yet).
+- `conftest.py` provides fixtures (`landing_page`, `login_page`, `signup_page`, `markets_page`, `trade_page`) that build the page object and already open it. It also raises the global `expect` timeout to 10 s.
+- Tests mark the whole module with `pytestmark`: `pytest.mark.smoke` for P1 user paths (run in CI), `pytest.mark.regression` for P2 and P3 checks (new files, not run in CI yet).
 
 ## Conventions and gotchas
 
