@@ -3,6 +3,7 @@ from playwright.sync_api import Page, expect
 
 from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
+from pages.markets_page import MarketsPage
 from pages.signup_page import SignUpPage
 from pages.trade_page import TradePage
 
@@ -24,6 +25,14 @@ def login_page(page: Page) -> LoginPage:
     login_page = LoginPage(page)
     login_page.open()
     return login_page
+
+
+# Gives a test the Markets page, already opened in a fresh browser tab
+@pytest.fixture
+def markets_page(page: Page) -> MarketsPage:
+    markets_page = MarketsPage(page)
+    markets_page.open()
+    return markets_page
 
 
 # Gives a test the Sign up page, already opened in a fresh browser tab
