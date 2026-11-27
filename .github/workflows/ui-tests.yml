@@ -1,4 +1,4 @@
-# Runs the smoke tests on GitHub's machines, inside our Docker image
+# Checks code style (Ruff) and runs the smoke tests on GitHub's machines
 name: UI tests
 
 # When it runs: every push to main, every Pull Request into main, or by hand
@@ -10,7 +10,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  # One job: the P1 smoke suite
+  # 🆕 Job 1: code style. Fast, needs only Python (no Docker, no browser)
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      # Downloads the repository code onto the machine
+      - uses: actions/checkout@v5
+
+      # Installs the same Python version as our venv and Docker image
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      # Installs Ruff at the version pinned in requirements-dev.txt
+      - name: Install dev tools
+        run: pip install -r requirements-dev.txt
+
+      # Linter: real bugs (unused imports, undefined names), PEP 8 style, import order
+      - name: Ruff check
+        run: ruff check .
+
+      # Formatter in check mode: fails if any file is not formatted (changes nothing)
+      - name: Ruff format check
+        run: ruff format --check .
+
+  # Job 2: the P1 smoke suite, inside our Docker image
   smoke:
     # Note: GitHub's runners are in the US, and Backpack shows US visitors
     # a different landing page (no Stocks). Tests check only what all regions share.

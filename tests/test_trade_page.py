@@ -1,7 +1,7 @@
 import re
 
-from playwright.sync_api import expect
 import pytest
+from playwright.sync_api import expect
 
 # Marks every test in this file as smoke (P1)
 pytestmark = pytest.mark.smoke

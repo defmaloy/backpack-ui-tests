@@ -1,7 +1,7 @@
 import re
 
-from playwright.sync_api import Page, expect
 import pytest
+from playwright.sync_api import Page, expect
 
 from pages.trade_page import TradePage
 

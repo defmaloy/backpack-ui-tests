@@ -1,5 +1,5 @@
-from playwright.sync_api import expect
 import pytest
+from playwright.sync_api import expect
 
 from tests.data import FAKE_EMAIL, FAKE_PASSWORD, FAKE_WEAK_PASSWORD
 

@@ -21,9 +21,7 @@ class MarketSearch:
         # Found markets have a "/" (ETH/USD) or "-PERP" (ETH-PERP) in their name.
         # Write "/" as "\/" in these patterns: Playwright puts the regex between
         # slashes (/.../) and an unescaped "/" breaks the selector.
-        self.market_results = self.results.get_by_role(
-            "option", name=re.compile(r"\/USD|-PERP")
-        )
+        self.market_results = self.results.get_by_role("option", name=re.compile(r"\/USD|-PERP"))
 
     # Returns one result row, matched by a pattern: the names also hold live prices.
     # A "/" in the pattern must be written as "\/" (see market_results).

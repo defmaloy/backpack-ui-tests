@@ -1,0 +1,4 @@
+# Tools for development and CI checks (not needed to run the tests).
+# Install with: pip install -r requirements-dev.txt
+-r requirements.txt
+ruff==0.16.6
