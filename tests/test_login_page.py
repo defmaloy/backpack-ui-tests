@@ -26,6 +26,13 @@ def test_log_in_button_disabled_with_email_only(login_page):
     expect(login_page.log_in_button).to_be_disabled()
 
 
+# Decision table, row 3: email empty, password filled -> button disabled
+def test_log_in_button_disabled_with_password_only(login_page):
+    login_page.password_input.fill(FAKE_PASSWORD)
+
+    expect(login_page.log_in_button).to_be_disabled()
+
+
 # Checks that the button becomes enabled when both fields are filled (never clicked)
 def test_log_in_button_enabled_when_form_filled(login_page):
     login_page.fill_form(FAKE_EMAIL, FAKE_PASSWORD)
