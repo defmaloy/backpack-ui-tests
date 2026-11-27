@@ -1,7 +1,7 @@
 import re
 
-from playwright.sync_api import expect
 import pytest
+from playwright.sync_api import expect
 
 # Marks every test in this file as regression (P2): kept out of the CI smoke run
 pytestmark = pytest.mark.regression

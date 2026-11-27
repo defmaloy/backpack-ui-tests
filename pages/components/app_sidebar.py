@@ -7,9 +7,7 @@ class AppSidebar:
     # Describes how to find the sidebar's elements (nothing is searched yet)
     def __init__(self, page: Page):
         # The sidebar is a <nav> without a name; it is the one with the "Home" link
-        self.root = page.get_by_role("navigation").filter(
-            has=page.get_by_role("link", name="Home", exact=True)
-        )
+        self.root = page.get_by_role("navigation").filter(has=page.get_by_role("link", name="Home", exact=True))
 
         # "Spot" under "Trade": opens the spot market (the market can change)
         self.spot_link = self.root.get_by_role("link", name="Spot", exact=True)

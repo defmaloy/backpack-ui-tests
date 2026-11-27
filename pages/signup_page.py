@@ -19,9 +19,7 @@ class SignUpPage(BasePage):
         # exact=True: skip the "Show password" eye button
         self.email_input = page.get_by_label("Email", exact=True)
         self.password_input = page.get_by_label("Password", exact=True)
-        self.terms_checkbox = page.get_by_role(
-            "checkbox", name="I agree to the Terms and Privacy Policy"
-        )
+        self.terms_checkbox = page.get_by_role("checkbox", name="I agree to the Terms and Privacy Policy")
 
         # The button reads "Loading…" first, then "Open account".
         # We find it only by its final name, so tests wait until it is ready.

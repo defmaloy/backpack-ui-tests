@@ -13,7 +13,7 @@ A UI test suite (pytest + Playwright, sync API, Python) for the **live productio
 - Fake data lives only in `tests/data.py` (example.com email). It is typed into forms, never submitted.
 - Run tests gently: no loops or repeated runs against the live site.
 - Never run `git push` and never commit to `main`. Work on a branch; the human reviews every diff before committing.
-- Don't change `.github/workflows/`, `Dockerfile` or `requirements.txt` unless asked.
+- Don't change `.github/workflows/`, `Dockerfile`, `requirements.txt`, `requirements-dev.txt` or `ruff.toml` unless asked.
 
 ## Browser exploration (Playwright MCP)
 
@@ -24,30 +24,33 @@ A UI test suite (pytest + Playwright, sync API, Python) for the **live productio
 
 ## Test design
 
-- Before writing a test, list its cases and name the technique used: equivalence partitioning, boundary values, decision table, state transition, or error guessing. Show this list in the plan for review first.
-- Pick the technique that fits: a form with several inputs → decision table; a value with limits → boundary values; tabs, menus or open/closed states → state transition.
+- Before writing a test, list its cases and name the technique used: equivalence partitioning, boundary values, decision table, state transition, error guessing, or use case testing. Show this list in the plan for review first.
+- Pick the technique that fits: a form with several inputs → decision table; a value with limits → boundary values; tabs, menus or open/closed states → state transition; following a link to another page → use case testing. If no technique fits (e.g. a page simply opens), say so honestly instead of forcing a label.
 - One behaviour per test. Check the "before" state too when a test checks a change (e.g. a menu is hidden before it opens).
 - Name the technique in the comment above the test, for example: `# Decision table: email filled, password empty -> button disabled`.
 - Use `pytest.mark.parametrize` when several cases share the same steps.
-- After writing or changing tests, run only the changed test file once (`pytest <file> -v`) and report the result. Never re-run the whole suite in a loop.
+- After writing or changing code, run `ruff check --fix .` and `ruff format .` first, then run only the changed test file once (`pytest <file> -v`) and report the result. Never re-run the whole suite in a loop.
 
 ## Commands
 
 Local (venv in `.venv/`, Windows):
-- Install: `pip install -r requirements.txt` then `playwright install chromium`
+- Install: `pip install -r requirements-dev.txt` (includes `requirements.txt`) then `playwright install chromium`
 - All tests: `pytest`
 - Smoke suite (what CI runs): `pytest -m smoke -v`
 - Regression suite (P2 and P3, not in CI yet): `pytest -m regression -v`
 - Single test: `pytest tests/test_login_page.py::test_login_form_is_visible`
 - Watch the browser: add `--headed` (and `--slowmo 500` if needed)
 
+Lint and format (Ruff, settings in `ruff.toml`, line length 120; CI fails if these fail):
+- Lint and auto-fix: `ruff check --fix .`
+- Format: `ruff format .`
+- Check only, change nothing (what CI runs): `ruff check .` and `ruff format --check .`
+
 Docker (same image as CI):
 - `docker build -t backpack-ui-tests .`
 - `docker run --rm --ipc=host -v "${PWD}/test-results:/app/test-results" backpack-ui-tests`
 
 On failure, traces and screenshots go to `test-results/` (configured in `pytest.ini`). Open a trace with `playwright show-trace <path>/trace.zip`.
-
-There is no linter or formatter configured.
 
 ## Architecture
 
@@ -61,8 +64,9 @@ There is no linter or formatter configured.
 ## Conventions and gotchas
 
 - Locator style: prefer `get_by_role` / `get_by_label` with `exact=True`. Scope to a container (`header`, `main`, or a component `root`) when the same text appears twice on the page (e.g. two "Sign up" buttons). For elements without stable ids, describe them by content (see `OrderBook.root`) and match numbers by regex pattern, never by live values.
+- `to_be_hidden()` also passes when the element doesn't exist. To prove something is absent, use `to_have_count(0)`; to prove a locator is right, also check it is visible in some state.
 - Region differences: the CI runners are in the US, and Backpack shows US visitors a different landing page (no Stocks, shorter descriptions). Assert only on text common to all regions.
 - A contains-match without `exact=True` is allowed only on purpose, with a comment saying why (see `LandingHeader.trade_menu_perpetuals`).
-- Version pinning: `playwright` in `requirements.txt` must match the Docker base image tag in `Dockerfile` (`mcr.microsoft.com/playwright/python:vX.Y.Z-noble`). Bump them together.
-- Code style: a short comment above every test, fixture and method, and a docstring for every class, explaining *what* and *why* in plain English.
-- CI (`.github/workflows/ui-tests.yml`) builds the Docker image and runs the smoke suite on every push and PR to `main`. Failure artifacts are uploaded for 7 days.
+- Version pinning: `playwright` in `requirements.txt` must match the Docker base image tag in `Dockerfile` (`mcr.microsoft.com/playwright/python:vX.Y.Z-noble`). Bump them together. Ruff is pinned in `requirements-dev.txt`.
+- Code style: a short comment above every test, fixture and method, and a docstring for every class, explaining *what* and *why* in plain English. Layout and import order are left to Ruff.
+- CI (`.github/workflows/ui-tests.yml`) has two jobs on every push and PR to `main`: `lint` (Ruff) and `smoke` (builds the Docker image and runs the smoke suite). Failure artifacts are uploaded for 7 days.

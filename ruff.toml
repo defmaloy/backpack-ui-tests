@@ -1,0 +1,11 @@
+# Ruff: linter and formatter settings for this project
+
+# Same limit as PyCharm's hard wrap: keeps each locator on one readable line
+line-length = 120
+
+# Our Python version (venv and Docker image)
+target-version = "py310"
+
+[lint]
+# E: style errors (pycodestyle), F: real bugs like unused imports (Pyflakes), I: import order (isort)
+select = ["E", "F", "I"]

@@ -4,6 +4,7 @@
     "defaultMode": "plan",
     "allow": [
       "Bash(pytest *)",
+      "Bash(ruff *)",
       "mcp__playwright"
     ],
     "deny": [
@@ -13,7 +14,9 @@
       "Bash(rm -rf *)",
       "Edit(./.github/**)",
       "Edit(./Dockerfile)",
-      "Edit(./requirements.txt)"
+      "Edit(./requirements.txt)",
+      "Edit(./requirements-dev.txt)",
+      "Edit(./ruff.toml)"
     ]
   }
 }
